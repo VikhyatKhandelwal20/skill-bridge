@@ -1,0 +1,163 @@
+[
+  {
+    "name": "PCNSA",
+    "provider": "Palo Alto Networks",
+    "type": "cert",
+    "level": "entry",
+    "track": "PANW Core Security"
+  },
+  {
+    "name": "PCNSE",
+    "provider": "Palo Alto Networks",
+    "type": "cert",
+    "level": "advanced",
+    "track": "PANW Threat Prevention"
+  },
+  {
+    "name": "PCCET",
+    "provider": "Palo Alto Networks",
+    "type": "cert",
+    "level": "architecture",
+    "track": "PANW Enterprise Architecture"
+  },
+  {
+    "name": "CompTIA Security+",
+    "provider": "CompTIA",
+    "type": "cert",
+    "level": "entry",
+    "track": "Foundations"
+  },
+  {
+    "name": "CompTIA CySA+",
+    "provider": "CompTIA",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Detection & Response"
+  },
+  {
+    "name": "CompTIA PenTest+",
+    "provider": "CompTIA",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Adversary Emulation"
+  },
+  {
+    "name": "ISC2 CC",
+    "provider": "ISC2",
+    "type": "cert",
+    "level": "entry",
+    "track": "Cloud Security"
+  },
+  {
+    "name": "ISC2 CISSP",
+    "provider": "ISC2",
+    "type": "cert",
+    "level": "advanced",
+    "track": "Security Leadership"
+  },
+  {
+    "name": "ISACA CISM",
+    "provider": "ISACA",
+    "type": "cert",
+    "level": "advanced",
+    "track": "Security Governance"
+  },
+  {
+    "name": "GIAC Security Essentials (GSEC)",
+    "provider": "GIAC",
+    "type": "cert",
+    "level": "entry",
+    "track": "Hands-on Security"
+  },
+  {
+    "name": "GIAC Security Analyst (GSA)",
+    "provider": "GIAC",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "SOC & Analysis"
+  },
+  {
+    "name": "GIAC Certified Incident Handler (GCIH)",
+    "provider": "GIAC",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Incident Response"
+  },
+  {
+    "name": "GIAC Threat Intelligence (GCTI)",
+    "provider": "GIAC",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Threat Intelligence"
+  },
+  {
+    "name": "AWS Certified Security - Specialty",
+    "provider": "Amazon Web Services",
+    "type": "cert",
+    "level": "advanced",
+    "track": "Cloud Security"
+  },
+  {
+    "name": "Microsoft SC-300: Identity and Access Administrator",
+    "provider": "Microsoft",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Identity & Access"
+  },
+  {
+    "name": "Google Professional Cloud Security Engineer",
+    "provider": "Google Cloud",
+    "type": "cert",
+    "level": "advanced",
+    "track": "Cloud Security"
+  },
+  {
+    "name": "Cisco Certified CyberOps Associate (CCSA)",
+    "provider": "Cisco",
+    "type": "cert",
+    "level": "entry",
+    "track": "SOC Operations"
+  },
+  {
+    "name": "SANS SEC401: Security Essentials",
+    "provider": "SANS Institute",
+    "type": "course",
+    "level": "entry",
+    "track": "Practical Foundations"
+  },
+  {
+    "name": "SANS FOR508: Windows Forensic Analysis",
+    "provider": "SANS Institute",
+    "type": "course",
+    "level": "advanced",
+    "track": "Forensics"
+  },
+  {
+    "name": "MITRE ATT&CK Fundamentals",
+    "provider": "MITRE",
+    "type": "course",
+    "level": "entry",
+    "track": "Threat Modeling"
+  },
+  {
+    "name": "Network Security Fundamentals (TCN) - Course",
+    "provider": "Industry Curriculum",
+    "type": "course",
+    "level": "entry",
+    "track": "Networking"
+  },
+  {
+    "name": "SIEM Detection Engineering Workshop",
+    "provider": "Industry Curriculum",
+    "type": "course",
+    "level": "intermediate",
+    "track": "Detection Engineering"
+  },
+  {
+    "name": "SOAR Automation for Security Teams - Course",
+    "provider": "Industry Curriculum",
+    "type": "course",
+    "level": "intermediate",
+    "track": "Automation"
+  }
+]

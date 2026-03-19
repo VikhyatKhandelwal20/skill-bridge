@@ -1,0 +1,52 @@
+[
+  {
+    "title": "SOC Analyst (L1/L2)",
+    "focus": "Monitoring and triage",
+    "targetSkills": ["SIEM", "alert triage", "log analysis", "incident escalation"]
+  },
+  {
+    "title": "Threat Intelligence Analyst",
+    "focus": "Contextualizing adversary activity",
+    "targetSkills": ["MITRE ATT&CK", "IOC/IOA analysis", "reporting", "intel enrichment"]
+  },
+  {
+    "title": "Incident Response Analyst",
+    "focus": "Detection-to-remediation workflows",
+    "targetSkills": ["IR playbooks", "forensics basics", "root cause analysis", "containment"]
+  },
+  {
+    "title": "Security Operations Engineer (SOAR/SIEM)",
+    "focus": "Automating response and tuning detections",
+    "targetSkills": ["SOAR", "automation", "detection engineering", "case management"]
+  },
+  {
+    "title": "Network Security Engineer (PAN-OS / Panorama)",
+    "focus": "Policy, segmentation, and threat prevention",
+    "targetSkills": ["PAN-OS", "Panorama", "NAT/firewall policy", "security profiles"]
+  },
+  {
+    "title": "Prisma Access Security Engineer (Cloud Edge)",
+    "focus": "Secure remote access and cloud connectivity",
+    "targetSkills": ["Prisma Access", "ZTNA concepts", "TLS/inspection", "routing/policy design"]
+  },
+  {
+    "title": "Palo Alto Networks Solutions Engineer (Presales)",
+    "focus": "Translating requirements into PANW outcomes",
+    "targetSkills": ["architecture discussions", "use cases", "proofs of concept", "technical presentations"]
+  },
+  {
+    "title": "Cloud Security Engineer",
+    "focus": "Protecting cloud workloads and networks",
+    "targetSkills": ["IAM security", "cloud logging", "secure configuration", "threat modeling"]
+  },
+  {
+    "title": "SIEM Engineer (Detection Engineering)",
+    "focus": "Signal processing and detection quality",
+    "targetSkills": ["correlation rules", "schema normalization", "alert quality", "dashboards/queries"]
+  },
+  {
+    "title": "Security Automation Engineer",
+    "focus": "Operationalizing security with scripts and pipelines",
+    "targetSkills": ["Python/JS scripting", "API integration", "workflow automation", "testing/runbooks"]
+  }
+]
