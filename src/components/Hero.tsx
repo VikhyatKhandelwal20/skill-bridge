@@ -35,17 +35,17 @@ export function Hero() {
 
             <div className="flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <a href="#get-started">
+                <a href="#tool">
                   Get started
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#cert-tracks">Explore cert paths</a>
+                <a href="#about">How it works</a>
               </Button>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3" id="approach">
+            <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-lg border border-border/60 bg-card/70 p-4 backdrop-blur">
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Shield className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -68,14 +68,13 @@ export function Hero() {
 
               <div
                 className="rounded-lg border border-border/60 bg-card/70 p-4 backdrop-blur"
-                id="palo-alto"
               >
                 <div className="flex items-center gap-2 text-sm font-medium">
                   <Shield className="h-4 w-4 text-primary" aria-hidden="true" />
-                  PANW Tracks
+                  Learning Roadmap
                 </div>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Map your path to PCNSA/PCNSE/PCCET and beyond.
+                  A chronological plan: courses + hands-on labs, step-by-step.
                 </p>
               </div>
             </div>
@@ -98,7 +97,7 @@ export function Hero() {
                   <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary">
                     2
                   </span>
-                  Recommended cert track(s) to close gaps.
+                  A timeline that unlocks missing skills.
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary">
@@ -118,44 +117,7 @@ export function Hero() {
           </aside>
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-3" id="cert-tracks">
-          <div className="rounded-xl border border-border/60 bg-background/50 p-5">
-            <p className="text-xs font-medium text-muted-foreground">
-              Entry
-            </p>
-            <p className="mt-1 text-sm font-semibold">PCNSA</p>
-            <p className="mt-2 text-xs text-foreground/70">
-              Fundamentals of next-gen security and PANW terminology.
-            </p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-background/50 p-5">
-            <p className="text-xs font-medium text-muted-foreground">
-              Specialist
-            </p>
-            <p className="mt-1 text-sm font-semibold">PCNSE</p>
-            <p className="mt-2 text-xs text-foreground/70">
-              Advanced threat prevention, segmentation, and policy mastery.
-            </p>
-          </div>
-          <div className="rounded-xl border border-border/60 bg-background/50 p-5">
-            <p className="text-xs font-medium text-muted-foreground">
-              Architecture
-            </p>
-            <p className="mt-1 text-sm font-semibold">PCCET</p>
-            <p className="mt-2 text-xs text-foreground/70">
-              Design and validate PANW solutions for enterprise environments.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-border/60 bg-card/70 p-6" id="get-started">
-          <h2 className="text-lg font-semibold">Ready to map your next move?</h2>
-          <p className="mt-2 max-w-2xl text-sm text-foreground/80">
-            This MVP foundation sets up resume parsing, trusted Zod schemas,
-            Groq-backed analysis with caching, and resilient UI error
-            boundaries. The next step is wiring the upload + analysis flow.
-          </p>
-        </div>
+        {/* Cert track previews moved to the About section */}
       </div>
     </section>
   );

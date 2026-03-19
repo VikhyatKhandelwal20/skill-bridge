@@ -1,0 +1,13 @@
+John Doe
+Systems Administrator
+
+Experience:
+- 4 years managing on-premise Linux servers (Ubuntu/RHEL) and Active Directory.
+- Configured basic firewall rules and monitored network traffic using Wireshark.
+- Automated routine backups using Bash scripting and basic Python.
+- Assisted in deploying containerized applications using Docker.
+
+Certifications:
+- CompTIA Security+
+
+Goal: Transitioning into Cloud Security, looking to secure AWS environments and automate security checks.

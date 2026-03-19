@@ -83,19 +83,15 @@ export function keywordFallback(resumeText: string): ResumeAnalysisOutput {
   const topSkills = Array.from(skillHits.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 7)
-    .map(([name, hits]) => ({
-      name,
-      confidence: clamp01(hits / maxSkillHits),
-    }));
+    .map(([name]) => name);
 
   // If we didn't match anything, provide a minimal baseline.
-  const skills =
-    topSkills.length > 0
-      ? topSkills
-      : [
-          { name: "security fundamentals", confidence: 0.35 },
-          { name: "threat awareness", confidence: 0.3 },
-        ];
+  const skills = topSkills.length
+    ? topSkills
+    : ["security fundamentals", "threat awareness"];
+
+  // Produce an overall confidence score without per-skill confidence.
+  const skillConfidence = clamp01(maxSkillHits / (maxSkillHits + 2));
 
   // 2) Certs: use keyword rules mapped to PANW cert tracks (then fallback).
   const certCounts = certKeywordRules.map((rule) => {
@@ -122,9 +118,7 @@ export function keywordFallback(resumeText: string): ResumeAnalysisOutput {
   if (matchedCerts.length > 0) {
     return {
       skills,
-      confidenceScore: clamp01(
-        Math.max(...skills.map((s) => s.confidence)) * 0.9,
-      ),
+      confidenceScore: clamp01(skillConfidence * 0.9),
       recommendedCerts: matchedCerts,
     };
   }

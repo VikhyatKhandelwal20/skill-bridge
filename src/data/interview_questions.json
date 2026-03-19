@@ -1,0 +1,54 @@
+{
+  "SOC Analyst (L1/L2)": [
+    {
+      "type": "Technical",
+      "question": "Walk me through your process for investigating an alert for a suspicious PowerShell execution.",
+      "focus": "Triage & Log Analysis"
+    },
+    {
+      "type": "Behavioral",
+      "question": "Describe a time you had to escalate an incident. What information did you provide to the L3 team?",
+      "focus": "Communication"
+    },
+    {
+      "type": "Scenario",
+      "question": "You see multiple failed login attempts followed by a successful one from an unusual IP. What are your immediate next steps?",
+      "focus": "Incident Response"
+    }
+  ],
+  "Cloud Security Engineer": [
+    {
+      "type": "Technical",
+      "question": "How would you design a secure S3 bucket policy to prevent public data exposure while allowing specific cross-account access?",
+      "focus": "IAM & Cloud Architecture"
+    },
+    {
+      "type": "Scenario",
+      "question": "A developer committed an AWS access key to a public GitHub repo. Walk me through your remediation steps.",
+      "focus": "Incident Response & Automation"
+    },
+    {
+      "type": "Conceptual",
+      "question": "Explain the difference between a Cloud Security Posture Management (CSPM) tool and a Cloud Workload Protection Platform (CWPP).",
+      "focus": "Tooling Context"
+    }
+  ],
+  "DevSecOps Engineer": [
+    {
+      "type": "Technical",
+      "question": "At what stages of a CI/CD pipeline would you integrate SAST, DAST, and SCA tools?",
+      "focus": "Shift-Left Strategy"
+    },
+    {
+      "type": "Behavioral",
+      "question": "How do you handle a situation where a critical security vulnerability is found, but the development team insists on pushing to production to meet a deadline?",
+      "focus": "Conflict Resolution & Empathy"
+    },
+    {
+      "type": "Technical",
+      "question": "Explain how you would secure a Kubernetes cluster, specifically focusing on pod-to-pod communication.",
+      "focus": "Container Security"
+    }
+  ]
+}
+

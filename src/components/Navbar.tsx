@@ -4,10 +4,8 @@ import { ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { label: "Approach", href: "#approach" },
-  { label: "Cert Tracks", href: "#cert-tracks" },
-  { label: "Palo Alto Skills", href: "#palo-alto" },
-  { label: "Get Started", href: "#get-started" },
+  { label: "About", href: "#about" },
+  { label: "Tool", href: "#tool" },
 ];
 
 export function Navbar() {
@@ -43,7 +41,7 @@ export function Navbar() {
 
         <div className="hidden md:block">
           <Button asChild size="sm">
-            <Link href="#get-started">Start your path</Link>
+            <Link href="#tool">Start your path</Link>
           </Button>
         </div>
       </div>

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       system:
         "You are a career navigator for Palo Alto Networks cybersecurity roles. " +
         "Analyze the user's resume text and output JSON that matches the provided schema exactly. " +
-        "Use confidence scores between 0 and 1.",
+        "Use confidence scores between 0 and 1 for overall and recommended certificates.",
       prompt:
         `Resume text:\n\n${resumeText}\n\n` +
         "Extract the most relevant skills and recommend Palo Alto Networks certification(s) that align to the user's skills and goals.",

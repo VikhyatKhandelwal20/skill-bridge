@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import jobs from "@/data/jobs.json";
+import projects from "@/data/projects.json";
 import { ResumeUploadAndAnalyze } from "./ResumeUploadAndAnalyze";
 
 describe("Gap Analysis UI (Phase 3)", () => {
@@ -13,7 +14,7 @@ describe("Gap Analysis UI (Phase 3)", () => {
 
   it("populates roles from jobs.json and renders gap cards from mocked /api/analyze-gap", async () => {
     const mockedAnalysis = {
-      skills: [{ name: "TCP/IP", confidence: 0.8 }],
+      skills: ["TCP/IP"],
       confidenceScore: 0.8,
       recommendedCerts: [{ cert: "PCNSA", confidence: 0.6 }],
     };
@@ -21,12 +22,19 @@ describe("Gap Analysis UI (Phase 3)", () => {
     const mockedGap = {
       matchedSkills: ["Networking Fundamentals"],
       missingSkills: ["PAN-OS"],
-      recommendedCourses: [
+      roadmap: [
         {
-          name: "PCNSA",
-          provider: "Palo Alto Networks",
-          track: "PANW Core Security",
-          reason: "Helps cover missing PAN-OS fundamentals.",
+          stepNumber: 1,
+          type: "course",
+          title: "PCNSA",
+          description: "Foundational course to start closing the gap.",
+          achievedSkills: ["PAN-OS"],
+        },
+        {
+          stepNumber: 2,
+          type: "project",
+          project: projects[0],
+          achievedSkills: ["PAN-OS"],
         },
       ],
     };
@@ -56,39 +64,29 @@ describe("Gap Analysis UI (Phase 3)", () => {
     render(<ResumeUploadAndAnalyze />);
 
     const textarea = screen.getByPlaceholderText(
-      "Paste resume text here to bypass PDF upload...",
+      "Paste your resume text here...",
     ) as HTMLTextAreaElement;
     fireEvent.change(textarea, {
       target: { value: "TCP/IP Cisco ASA Wireshark" },
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit text" }));
+    fireEvent.click(screen.getByRole("button", { name: "Generate roadmap" }));
 
     // Wait until the analysis section renders (select should appear).
     await waitFor(() => {
       expect(screen.getByText(/Confidence:\s*80%/)).toBeInTheDocument();
     });
 
-    const selects = screen.getAllByRole("combobox");
-    expect(selects.length).toBeGreaterThan(0);
-    const roleSelect = selects[0] as HTMLSelectElement;
-
-    // Validate that options exist from jobs.json.
-    const optionTexts = Array.from(roleSelect.options).map(
-      (o) => o.textContent,
-    );
-    expect(optionTexts).toContain(jobs[0].title);
-
-    // Trigger gap analysis.
-    fireEvent.change(roleSelect, { target: { value: jobs[0].title } });
+    const roleCombo = screen.getByRole("combobox") as HTMLInputElement;
+    fireEvent.change(roleCombo, { target: { value: jobs[0].title } });
+    fireEvent.click(screen.getByText(jobs[0].title));
 
     // Verify the three cards render mocked gap data.
     await waitFor(() => {
       expect(screen.getByText("Networking Fundamentals")).toBeInTheDocument();
-      expect(screen.getByText("PAN-OS")).toBeInTheDocument();
-      // Use fields that are unique to the gap-card itself.
+      expect(screen.getAllByText("PAN-OS").length).toBeGreaterThan(0);
       expect(
-        screen.getByText(/Helps cover missing PAN-OS fundamentals\./),
+        screen.getByText(/Foundational course to start closing the gap\./),
       ).toBeInTheDocument();
     });
   });

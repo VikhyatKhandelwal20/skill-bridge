@@ -21,12 +21,19 @@ describe("/api/analyze-gap", () => {
     const mockedGap = {
       matchedSkills: ["Networking Fundamentals"],
       missingSkills: ["PAN-OS"],
-      recommendedCourses: [
+      roadmap: [
         {
-          name: "PCNSA",
-          provider: "Palo Alto Networks",
-          track: "PANW Core Security",
-          reason: "Helps cover the missing PAN-OS fundamentals.",
+          stepNumber: 1,
+          type: "course",
+          title: "PCNSA",
+          description: "Foundational course to start closing the gap.",
+          achievedSkills: ["PAN-OS"],
+        },
+        {
+          stepNumber: 2,
+          type: "project",
+          projectId: "proj-siem-triage-01",
+          achievedSkills: ["PAN-OS"],
         },
       ],
     };

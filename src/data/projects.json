@@ -1,0 +1,68 @@
+[
+  {
+    "id": "proj-siem-triage-01",
+    "title": "Home Lab: SIEM Deployment & Triage Playbook",
+    "associatedRoles": ["SOC Analyst (L1/L2)", "Security Automation Engineer"],
+    "targetSkills": ["SIEM administration", "Log analysis", "Incident response"],
+    "prerequisiteCourses": ["SIEM Detection Engineering Workshop"],
+    "overview": "Build a local logging environment to simulate adversary behavior and practice detection engineering.",
+    "journeySteps": [
+      { "stepNumber": 1, "name": "Infrastructure Setup", "instruction": "Deploy an ELK Stack (Elasticsearch, Logstash, Kibana) or Splunk Free locally using Docker Compose.", "learningOutcome": "Practical experience with containerized logging infrastructure and data ingestion." },
+      { "stepNumber": 2, "name": "Data Ingestion & Parsing", "instruction": "Configure Sysmon on a Windows VM and forward Windows Event Logs to your SIEM.", "learningOutcome": "Understanding of endpoint telemetry and log normalization." },
+      { "stepNumber": 3, "name": "Simulate & Detect", "instruction": "Use Atomic Red Team to simulate credential dumping (e.g., Mimikatz). Write a detection rule for the generated logs.", "learningOutcome": "Hands-on threat hunting and detection rule creation." }
+    ]
+  },
+  {
+    "id": "proj-ztna-arch-02",
+    "title": "Zero Trust Architecture: Edge Security Simulation",
+    "associatedRoles": ["Prisma Access Security Engineer (Cloud Edge)", "Network Security Engineer"],
+    "targetSkills": ["Zero Trust Network Access (ZTNA)", "Identity and Access Management (IAM)", "Network routing (BGP/OSPF)"],
+    "prerequisiteCourses": ["PCNSA", "PCCET"],
+    "overview": "Design and implement a simulated Zero Trust boundary using open-source tools to secure remote access.",
+    "journeySteps": [
+      { "stepNumber": 1, "name": "Identity Provider Setup", "instruction": "Configure a free tier Okta or Entra ID tenant with multi-factor authentication (MFA) enabled.", "learningOutcome": "Core understanding of IAM and IdP integration." },
+      { "stepNumber": 2, "name": "Deploy Identity-Aware Proxy", "instruction": "Set up Cloudflare Tunnels or an open-source IAP (like Pomerium) in front of a dummy web application.", "learningOutcome": "Replacing traditional VPNs with context-aware access controls." },
+      { "stepNumber": 3, "name": "Granular Policy Creation", "instruction": "Write policies that restrict access based on user role and device posture (e.g., block access from non-compliant IPs).", "learningOutcome": "Implementing Least Privilege in a modern edge environment." }
+    ]
+  },
+  {
+    "id": "proj-devsecops-cicd-03",
+    "title": "Shift-Left: Automated Security in CI/CD",
+    "associatedRoles": ["DevSecOps Engineer", "Software Engineer (Security Products)"],
+    "targetSkills": ["CI/CD pipelines", "Static/Dynamic code analysis (SAST/DAST)", "Docker/Kubernetes"],
+    "prerequisiteCourses": ["Secure Coding Best Practices (OWASP)", "Certified Kubernetes Administrator (CKA)"],
+    "overview": "Build a secure software supply chain by integrating automated security gates into a GitHub Actions pipeline.",
+    "journeySteps": [
+      { "stepNumber": 1, "name": "Vulnerable App Baseline", "instruction": "Fork a deliberately vulnerable application (e.g., OWASP Juice Shop) into a new GitHub repository.", "learningOutcome": "Understanding common web vulnerabilities and Git workflows." },
+      { "stepNumber": 2, "name": "SAST & Secret Scanning", "instruction": "Implement GitHub Actions to run Semgrep (SAST) and TruffleHog (Secret Scanning) on every Pull Request.", "learningOutcome": "Automated code-level vulnerability detection." },
+      { "stepNumber": 3, "name": "Container Security", "instruction": "Add a pipeline step to build a Docker image and scan it with Trivy before pushing to a registry. Block the build on 'CRITICAL' findings.", "learningOutcome": "Ensuring secure container orchestration and artifact integrity." }
+    ]
+  },
+  {
+    "id": "proj-cloud-cspm-04",
+    "title": "Cloud Workload Protection & Auditing",
+    "associatedRoles": ["Cloud Security Engineer"],
+    "targetSkills": ["AWS/Azure/GCP security", "Cloud Security Posture Management (CSPM)", "Infrastructure as Code (IaC)"],
+    "prerequisiteCourses": ["AWS Certified Security - Specialty"],
+    "overview": "Deploy cloud infrastructure using Terraform and audit it for misconfigurations using CSPM tooling.",
+    "journeySteps": [
+      { "stepNumber": 1, "name": "Insecure Infrastructure via IaC", "instruction": "Write a Terraform script to deploy an AWS S3 bucket with public read access and an EC2 instance with an open SSH port.", "learningOutcome": "Translating cloud architecture into code (IaC)." },
+      { "stepNumber": 2, "name": "Automated Auditing", "instruction": "Run Checkov or Prowler against your Terraform configuration to identify security misconfigurations.", "learningOutcome": "Using CSPM tools to assess compliance against frameworks like CIS benchmarks." },
+      { "stepNumber": 3, "name": "Remediation & Least Privilege", "instruction": "Refactor the Terraform code to enforce S3 Block Public Access and attach an IAM instance profile utilizing least privilege.", "learningOutcome": "Practical remediation of cloud security risks." }
+    ]
+  },
+  {
+    "id": "proj-intel-malware-05",
+    "title": "Threat Intel Sandbox & OSINT Investigation",
+    "associatedRoles": ["Threat Intelligence Analyst", "Incident Response Analyst"],
+    "targetSkills": ["Threat hunting", "Open-source intelligence (OSINT)", "Malware analysis", "MITRE ATT&CK"],
+    "prerequisiteCourses": ["GIAC Certified Incident Handler (GCIH)"],
+    "overview": "Safely analyze a malicious payload and map adversary techniques to the MITRE ATT&CK framework.",
+    "journeySteps": [
+      { "stepNumber": 1, "name": "Safe Sandbox Setup", "instruction": "Deploy a heavily isolated Windows Flare-VM or REMnux environment. Ensure host-only networking.", "learningOutcome": "Establishing safe environments for handling live malware." },
+      { "stepNumber": 2, "name": "Static & Dynamic Analysis", "instruction": "Obtain a benign test file or defanged malware sample. Use tools like Pestudio (static) and Procmon/Wireshark (dynamic) to observe behavior.", "learningOutcome": "Identifying Indicators of Compromise (IoCs) and behavioral anomalies." },
+      { "stepNumber": 3, "name": "OSINT & MITRE Mapping", "instruction": "Take the discovered file hashes/IPs and pivot using VirusTotal or AlienVault OTX. Map the observed behaviors to specific MITRE ATT&CK T-codes.", "learningOutcome": "Generating actionable threat intelligence and contextualizing adversary methods." }
+    ]
+  }
+]
+
