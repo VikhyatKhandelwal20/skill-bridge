@@ -2,51 +2,51 @@
   {
     "title": "SOC Analyst (L1/L2)",
     "focus": "Monitoring and triage",
-    "targetSkills": ["SIEM", "alert triage", "log analysis", "incident escalation"]
+    "targetSkills": ["SIEM administration", "Log analysis", "Incident response", "Endpoint security"]
   },
   {
     "title": "Threat Intelligence Analyst",
     "focus": "Contextualizing adversary activity",
-    "targetSkills": ["MITRE ATT&CK", "IOC/IOA analysis", "reporting", "intel enrichment"]
+    "targetSkills": ["MITRE ATT&CK", "Threat hunting", "Open-source intelligence (OSINT)", "Malware analysis"]
   },
   {
     "title": "Incident Response Analyst",
     "focus": "Detection-to-remediation workflows",
-    "targetSkills": ["IR playbooks", "forensics basics", "root cause analysis", "containment"]
+    "targetSkills": ["Digital forensics", "Incident containment", "Malware reverse engineering", "Network traffic analysis"]
   },
   {
-    "title": "Security Operations Engineer (SOAR/SIEM)",
-    "focus": "Automating response and tuning detections",
-    "targetSkills": ["SOAR", "automation", "detection engineering", "case management"]
+    "title": "DevSecOps Engineer",
+    "focus": "Securing the software development lifecycle",
+    "targetSkills": ["Docker/Kubernetes", "CI/CD pipelines", "Static/Dynamic code analysis (SAST/DAST)", "Infrastructure as Code (IaC)"]
   },
   {
-    "title": "Network Security Engineer (PAN-OS / Panorama)",
+    "title": "Network Security Engineer",
     "focus": "Policy, segmentation, and threat prevention",
-    "targetSkills": ["PAN-OS", "Panorama", "NAT/firewall policy", "security profiles"]
+    "targetSkills": ["Next-Generation Firewalls (NGFW)", "Network routing (BGP/OSPF)", "VPN configuration", "Traffic decryption"]
   },
   {
     "title": "Prisma Access Security Engineer (Cloud Edge)",
     "focus": "Secure remote access and cloud connectivity",
-    "targetSkills": ["Prisma Access", "ZTNA concepts", "TLS/inspection", "routing/policy design"]
+    "targetSkills": ["Zero Trust Network Access (ZTNA)", "Cloud security architecture", "Identity and Access Management (IAM)", "Secure Web Gateway (SWG)"]
   },
   {
     "title": "Palo Alto Networks Solutions Engineer (Presales)",
-    "focus": "Translating requirements into PANW outcomes",
-    "targetSkills": ["architecture discussions", "use cases", "proofs of concept", "technical presentations"]
+    "focus": "Translating requirements into technical outcomes",
+    "targetSkills": ["Enterprise security architecture", "Technical solution design", "Customer requirements gathering", "Network security fundamentals"]
   },
   {
     "title": "Cloud Security Engineer",
     "focus": "Protecting cloud workloads and networks",
-    "targetSkills": ["IAM security", "cloud logging", "secure configuration", "threat modeling"]
+    "targetSkills": ["AWS/Azure/GCP security", "Kubernetes/Container security", "Cloud Security Posture Management (CSPM)", "Serverless security"]
   },
   {
-    "title": "SIEM Engineer (Detection Engineering)",
-    "focus": "Signal processing and detection quality",
-    "targetSkills": ["correlation rules", "schema normalization", "alert quality", "dashboards/queries"]
+    "title": "Software Engineer (Security Products)",
+    "focus": "Building scalable security applications",
+    "targetSkills": ["Go/Rust/C++", "Microservices architecture", "RESTful APIs", "Linux administration"]
   },
   {
     "title": "Security Automation Engineer",
-    "focus": "Operationalizing security with scripts and pipelines",
-    "targetSkills": ["Python/JS scripting", "API integration", "workflow automation", "testing/runbooks"]
+    "focus": "Operationalizing security with scripts",
+    "targetSkills": ["Python scripting", "API integration", "Security orchestration (SOAR)", "Detection rules creation"]
   }
 ]

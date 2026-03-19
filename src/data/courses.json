@@ -17,7 +17,7 @@
     "name": "PCCET",
     "provider": "Palo Alto Networks",
     "type": "cert",
-    "level": "architecture",
+    "level": "entry",
     "track": "PANW Enterprise Architecture"
   },
   {
@@ -28,67 +28,11 @@
     "track": "Foundations"
   },
   {
-    "name": "CompTIA CySA+",
-    "provider": "CompTIA",
-    "type": "cert",
-    "level": "intermediate",
-    "track": "Detection & Response"
-  },
-  {
-    "name": "CompTIA PenTest+",
-    "provider": "CompTIA",
-    "type": "cert",
-    "level": "intermediate",
-    "track": "Adversary Emulation"
-  },
-  {
-    "name": "ISC2 CC",
-    "provider": "ISC2",
-    "type": "cert",
-    "level": "entry",
-    "track": "Cloud Security"
-  },
-  {
     "name": "ISC2 CISSP",
     "provider": "ISC2",
     "type": "cert",
     "level": "advanced",
     "track": "Security Leadership"
-  },
-  {
-    "name": "ISACA CISM",
-    "provider": "ISACA",
-    "type": "cert",
-    "level": "advanced",
-    "track": "Security Governance"
-  },
-  {
-    "name": "GIAC Security Essentials (GSEC)",
-    "provider": "GIAC",
-    "type": "cert",
-    "level": "entry",
-    "track": "Hands-on Security"
-  },
-  {
-    "name": "GIAC Security Analyst (GSA)",
-    "provider": "GIAC",
-    "type": "cert",
-    "level": "intermediate",
-    "track": "SOC & Analysis"
-  },
-  {
-    "name": "GIAC Certified Incident Handler (GCIH)",
-    "provider": "GIAC",
-    "type": "cert",
-    "level": "intermediate",
-    "track": "Incident Response"
-  },
-  {
-    "name": "GIAC Threat Intelligence (GCTI)",
-    "provider": "GIAC",
-    "type": "cert",
-    "level": "intermediate",
-    "track": "Threat Intelligence"
   },
   {
     "name": "AWS Certified Security - Specialty",
@@ -98,25 +42,32 @@
     "track": "Cloud Security"
   },
   {
-    "name": "Microsoft SC-300: Identity and Access Administrator",
-    "provider": "Microsoft",
+    "name": "AWS Certified Developer - Associate",
+    "provider": "Amazon Web Services",
     "type": "cert",
     "level": "intermediate",
-    "track": "Identity & Access"
+    "track": "Software Engineering"
   },
   {
-    "name": "Google Professional Cloud Security Engineer",
-    "provider": "Google Cloud",
+    "name": "Certified Kubernetes Administrator (CKA)",
+    "provider": "Cloud Native Computing Foundation",
     "type": "cert",
     "level": "advanced",
-    "track": "Cloud Security"
+    "track": "DevOps & Cloud"
   },
   {
-    "name": "Cisco Certified CyberOps Associate (CCSA)",
-    "provider": "Cisco",
+    "name": "Certified Kubernetes Security Specialist (CKS)",
+    "provider": "Cloud Native Computing Foundation",
     "type": "cert",
-    "level": "entry",
-    "track": "SOC Operations"
+    "level": "advanced",
+    "track": "DevSecOps"
+  },
+  {
+    "name": "GIAC Certified Incident Handler (GCIH)",
+    "provider": "GIAC",
+    "type": "cert",
+    "level": "intermediate",
+    "track": "Incident Response"
   },
   {
     "name": "SANS SEC401: Security Essentials",
@@ -126,25 +77,18 @@
     "track": "Practical Foundations"
   },
   {
-    "name": "SANS FOR508: Windows Forensic Analysis",
-    "provider": "SANS Institute",
+    "name": "Secure Coding Best Practices (OWASP)",
+    "provider": "Industry Curriculum",
     "type": "course",
-    "level": "advanced",
-    "track": "Forensics"
+    "level": "intermediate",
+    "track": "Software Engineering"
   },
   {
-    "name": "MITRE ATT&CK Fundamentals",
-    "provider": "MITRE",
-    "type": "course",
-    "level": "entry",
-    "track": "Threat Modeling"
-  },
-  {
-    "name": "Network Security Fundamentals (TCN) - Course",
+    "name": "Go Programming Fundamentals",
     "provider": "Industry Curriculum",
     "type": "course",
     "level": "entry",
-    "track": "Networking"
+    "track": "Software Engineering"
   },
   {
     "name": "SIEM Detection Engineering Workshop",
@@ -154,7 +98,7 @@
     "track": "Detection Engineering"
   },
   {
-    "name": "SOAR Automation for Security Teams - Course",
+    "name": "SOAR Automation for Security Teams",
     "provider": "Industry Curriculum",
     "type": "course",
     "level": "intermediate",
