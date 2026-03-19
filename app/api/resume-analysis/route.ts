@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const { resumeText } = parsed.data;
 
     const result = await generateObject({
-      model: groq("llama-3.3-70b-versatile"),
+      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
       schema: ResumeAnalysisOutputSchema,
       system:
         "You are a career navigator for Palo Alto Networks cybersecurity roles. " +
@@ -39,12 +39,12 @@ export async function POST(request: Request) {
     // `generateObject` should already conform to schema, but keep a defensive check.
     const output = ResumeAnalysisOutputSchema.parse(result.object);
     return Response.json(output);
-  } catch {
-    // Avoid leaking provider internals.
+  } catch (error) {
+    // Log error details for debugging, but do not leak to frontend.
+    console.error('GROQ ANALYSIS ERROR:', error);
     return Response.json(
       { error: "Groq resume analysis failed." },
       { status: 502 },
     );
   }
 }
-
