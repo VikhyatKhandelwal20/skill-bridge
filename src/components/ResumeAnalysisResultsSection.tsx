@@ -43,21 +43,7 @@ export function ResumeAnalysisResultsSection({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-6 md:grid-cols-2">
-        <div>
-          <h3 className="text-sm font-semibold">Top Skills</h3>
-          <ul className="mt-3 space-y-2">
-            {analysis.skills.map((s) => (
-              <li key={s.name} className="flex items-center justify-between gap-3">
-                <span className="text-sm">{s.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {(s.confidence * 100).toFixed(0)}%
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
+      <div className="mt-5">
         <div>
           <h3 className="text-sm font-semibold">Recommended Certs</h3>
           <ul className="mt-3 space-y-2">
