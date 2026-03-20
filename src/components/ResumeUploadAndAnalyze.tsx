@@ -55,6 +55,9 @@ export function ResumeUploadAndAnalyze({
   const [gapResult, setGapResult] = React.useState<GapAnalysisOutput | null>(
     null,
   );
+  const [hasUnsavedSkillChanges, setHasUnsavedSkillChanges] =
+    React.useState(false);
+  const [isRecalculating, setIsRecalculating] = React.useState(false);
 
   const isBusy = isAnalyzing;
   const jobs = jobsData as { title: string; targetSkills: string[] }[];
@@ -63,12 +66,50 @@ export function ResumeUploadAndAnalyze({
     if (analysis) {
       setEditableSkills(analysis.skills);
       setSkillDraft("");
+      setHasUnsavedSkillChanges(false);
     } else {
       setEditableSkills([]);
       setSkillDraft("");
       setGapResult(null);
+      setHasUnsavedSkillChanges(false);
     }
   }, [analysis]);
+
+  async function handleRecalculateAnalysis() {
+    if (roleMode !== "predefined") return;
+    if (!selectedJobTitle.trim()) return;
+    if (!resumeText.trim()) return;
+    if (editableSkills.length === 0) return;
+
+    setIsRecalculating(true);
+    setErrorMessage(null);
+    try {
+      const res = await fetch("/api/analyze-gap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userSkills: editableSkills,
+          targetRole: selectedJobTitle.trim(),
+          resumeText: resumeText.trim(),
+        }),
+      });
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => null);
+        throw new Error(json?.error ?? "Gap analysis failed.");
+      }
+
+      const data = (await res.json()) as GapAnalysisOutput;
+      setGapResult(data);
+      setHasUnsavedSkillChanges(false);
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : "Gap analysis failed.",
+      );
+    } finally {
+      setIsRecalculating(false);
+    }
+  }
 
   async function handleAnalyze() {
     const hasResumePdf = activeTab === "upload" && pdfFile && pdfFile.size > 0;
@@ -446,11 +487,12 @@ export function ResumeUploadAndAnalyze({
                         type="button"
                         aria-label={`Remove ${skill}`}
                         className="inline-flex h-4 w-4 items-center justify-center rounded-full text-amber-500/90 hover:text-amber-400"
-                        onClick={() =>
+                        onClick={() => {
+                          setHasUnsavedSkillChanges(true);
                           setEditableSkills((prev) =>
                             prev.filter((s) => s !== skill),
-                          )
-                        }
+                          );
+                        }}
                       >
                         <X className="h-3 w-3" aria-hidden />
                       </button>
@@ -465,7 +507,7 @@ export function ResumeUploadAndAnalyze({
                   onChange={(e) => setSkillDraft(e.target.value)}
                   placeholder="Add a missing skill (e.g., Prisma, PAN-OS, CISSP basics)"
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  disabled={isBusy}
+                  disabled={isBusy || isRecalculating}
                   onKeyDown={(e) => {
                     if (e.key !== "Enter") return;
                     e.preventDefault();
@@ -474,6 +516,7 @@ export function ResumeUploadAndAnalyze({
                     setEditableSkills((prev) =>
                       prev.includes(next) ? prev : [...prev, next],
                     );
+                    setHasUnsavedSkillChanges(true);
                     setSkillDraft("");
                   }}
                 />
@@ -481,19 +524,39 @@ export function ResumeUploadAndAnalyze({
                   type="button"
                   size="sm"
                   variant="outline"
-                  disabled={isBusy || !skillDraft.trim()}
+                  disabled={isBusy || isRecalculating || !skillDraft.trim()}
                   onClick={() => {
                     const next = skillDraft.trim();
                     if (!next) return;
                     setEditableSkills((prev) =>
                       prev.includes(next) ? prev : [...prev, next],
                     );
+                    setHasUnsavedSkillChanges(true);
                     setSkillDraft("");
                   }}
                 >
                   Add Skill
                 </Button>
               </div>
+
+              {roleMode === "predefined" &&
+                gapResult &&
+                hasUnsavedSkillChanges && (
+                  <div className="mt-4">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={isBusy || isRecalculating}
+                      onClick={() => {
+                        void handleRecalculateAnalysis();
+                      }}
+                    >
+                      {isRecalculating
+                        ? "Updating Roadmap..."
+                        : "Recalculate Analysis"}
+                    </Button>
+                  </div>
+                )}
             </div>
 
             {gapResult && (
