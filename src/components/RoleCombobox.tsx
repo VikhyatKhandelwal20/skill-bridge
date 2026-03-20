@@ -5,6 +5,7 @@ import * as React from "react";
 import {
   Command,
   CommandEmpty,
+  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -17,7 +18,7 @@ export function RoleCombobox({
   options,
   value,
   onChange,
-  placeholder = "Search roles...",
+  placeholder = "Select a role…",
   disabled,
 }: {
   options: RoleOption[];
@@ -26,60 +27,64 @@ export function RoleCombobox({
   placeholder?: string;
   disabled?: boolean;
 }) {
-  const [query, setQuery] = React.useState("");
+  const [roleSearchQuery, setRoleSearchQuery] = React.useState("");
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
+  const filteredRoles = React.useMemo(() => {
+    const q = roleSearchQuery.trim().toLowerCase();
     if (!q) return options;
-    return options.filter((o) => o.title.toLowerCase().includes(q));
-  }, [options, query]);
+    return options.filter((job) =>
+      job.title.toLowerCase().includes(q),
+    );
+  }, [options, roleSearchQuery]);
 
   return (
     <div className="relative">
       <label className="sr-only">Select a target role</label>
-      <div className="flex items-center gap-2">
-        <input
-          role="combobox"
-          aria-expanded={isOpen}
-          aria-controls="role-combobox-list"
-          aria-autocomplete="list"
-          value={query.length ? query : value}
-          onChange={(e) => {
-            if (disabled) return;
-            setIsOpen(true);
-            setQuery(e.target.value);
-          }}
-          onFocus={() => setIsOpen(true)}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-        />
-      </div>
+      <button
+        type="button"
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-controls="role-combobox-list"
+        disabled={disabled}
+        onClick={() => !disabled && setIsOpen((o) => !o)}
+        className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-left text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
+      >
+        <span className={value ? "text-foreground" : "text-muted-foreground"}>
+          {value || placeholder}
+        </span>
+      </button>
 
       {isOpen && !disabled && (
-        <Command className="w-full">
-          <CommandList>
-            {filtered.length === 0 ? (
-              <CommandEmpty>No roles found.</CommandEmpty>
-            ) : (
-              filtered.map((o) => (
-                <CommandItem
-                  key={o.title}
-                  onSelect={() => {
-                    onChange(o.title);
-                    setIsOpen(false);
-                    setQuery("");
-                  }}
-                >
-                  {o.title}
-                </CommandItem>
-              ))
-            )}
-          </CommandList>
+        <Command className="absolute z-50 mt-1 w-full rounded-md border border-border/60 bg-card p-2 shadow-md">
+          <CommandInput
+            value={roleSearchQuery}
+            onValueChange={setRoleSearchQuery}
+            placeholder="Search roles..."
+            aria-label="Search roles"
+          />
+          <div id="role-combobox-list" role="listbox">
+            <CommandList>
+              {filteredRoles.length === 0 ? (
+                <CommandEmpty>No roles found.</CommandEmpty>
+              ) : (
+                filteredRoles.map((o) => (
+                  <CommandItem
+                    key={o.title}
+                    onSelect={() => {
+                      onChange(o.title);
+                      setIsOpen(false);
+                      setRoleSearchQuery("");
+                    }}
+                  >
+                    {o.title}
+                  </CommandItem>
+                ))
+              )}
+            </CommandList>
+          </div>
         </Command>
       )}
     </div>
   );
 }
-

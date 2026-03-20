@@ -82,9 +82,11 @@ describe("ResumeUploadAndAnalyze (PDF + FormData architecture)", () => {
     ) as HTMLTextAreaElement;
     fireEvent.change(textarea, { target: { value: "Sample resume text" } });
 
-    const roleCombo = screen.getByRole("combobox") as HTMLInputElement;
-    fireEvent.focus(roleCombo);
-    fireEvent.change(roleCombo, { target: { value: (jobs as { title: string }[])[0].title } });
+    fireEvent.click(screen.getByRole("combobox"));
+    const roleSearch = screen.getByPlaceholderText("Search roles...");
+    fireEvent.change(roleSearch, {
+      target: { value: (jobs as { title: string }[])[0].title },
+    });
     fireEvent.click(screen.getByText((jobs as { title: string }[])[0].title));
 
     const analyzeBtn = screen.getByRole("button", { name: "Analyze" });
@@ -128,9 +130,11 @@ describe("ResumeUploadAndAnalyze (PDF + FormData architecture)", () => {
     ) as HTMLTextAreaElement;
     fireEvent.change(textarea, { target: { value: "Sample resume text" } });
 
-    const roleCombo = screen.getByRole("combobox") as HTMLInputElement;
-    fireEvent.focus(roleCombo);
-    fireEvent.change(roleCombo, { target: { value: (jobs as { title: string }[])[0].title } });
+    fireEvent.click(screen.getByRole("combobox"));
+    const roleSearch = screen.getByPlaceholderText("Search roles...");
+    fireEvent.change(roleSearch, {
+      target: { value: (jobs as { title: string }[])[0].title },
+    });
     fireEvent.click(screen.getByText((jobs as { title: string }[])[0].title));
 
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
