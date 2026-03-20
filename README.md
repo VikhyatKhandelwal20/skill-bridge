@@ -3,6 +3,9 @@
 ## Candidate Name
 Vikhyat Khandelwal
 
+## Video Link
+https://vimeo.com/1175433681?share=copy&fl=sv&fe=ci#t=0
+
 ## Scenario Chosen
 2. Skill-Bridge Career Navigator
 
