@@ -14,7 +14,8 @@ type Question = {
 };
 
 export function RoleSpecificInterviewPrep({ role }: { role: string }) {
-  const questions = (interviewQuestions as Record<string, Question[]>)[role];
+  const roleKey = role.trim();
+  const questions = (interviewQuestions as Record<string, Question[]>)[roleKey];
 
   if (!questions || questions.length === 0) {
     return (

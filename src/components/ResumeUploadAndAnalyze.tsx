@@ -66,7 +66,6 @@ export function ResumeUploadAndAnalyze({
     } else {
       setEditableSkills([]);
       setSkillDraft("");
-      setSelectedJobTitle("");
       setGapResult(null);
     }
   }, [analysis]);
