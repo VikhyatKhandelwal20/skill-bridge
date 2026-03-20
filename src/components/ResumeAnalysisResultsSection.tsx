@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { TriangleAlert } from "lucide-react";
 
 import type { ResumeAnalysisOutput } from "@/lib/schema";
 
@@ -27,8 +28,8 @@ export function ResumeAnalysisResultsSection({
           recommended PANW certification tracks.
         </p>
         <p className="mt-4 text-xs text-muted-foreground">
-          Tip: analysis is cached by a SHA-256 hash in sessionStorage to avoid
-          redundant Groq calls.
+          Your analysis is saved during your session so you can explore
+          different roles without re-uploading.
         </p>
       </div>
     );
@@ -36,6 +37,19 @@ export function ResumeAnalysisResultsSection({
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card/70 p-6 backdrop-blur">
+      {analysis.isFallback && (
+        <div
+          className="mb-4 flex items-center gap-2 rounded-md border border-amber-500 bg-amber-500/10 px-4 py-3 text-amber-500"
+          role="status"
+        >
+          <TriangleAlert className="h-5 w-5 shrink-0" aria-hidden />
+          <p className="text-sm">
+            AI resume extraction is unavailable. Showing rule-based skills and
+            cert suggestions derived from your pasted text.
+          </p>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <h2 className="text-base font-semibold">AI Analysis Results</h2>
         <div className="rounded-full border border-border/60 bg-background/70 px-3 py-1 text-xs text-muted-foreground">

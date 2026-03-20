@@ -5,12 +5,23 @@ const RecommendedCertSchema = z.object({
   confidence: z.number().min(0).max(1),
 });
 
-// Output contract for the resume analysis LLM call.
-export const ResumeAnalysisOutputSchema = z.object({
-  // Individual skills are represented as strings only.
-  skills: z.array(z.string().min(1)).min(1),
+/** Fields the resume LLM is allowed to return (no client-only flags). */
+export const ResumeAnalysisAiSchema = z.object({
+  skills: z
+    .array(z.string().min(1))
+    .min(1)
+    .describe(
+      "Exhaustive, flat list of all technical skills, tools, protocols, and concepts found in the resume.",
+    ),
   confidenceScore: z.number().min(0).max(1),
   recommendedCerts: z.array(RecommendedCertSchema).min(1),
+});
+
+export type ResumeAnalysisAiOutput = z.infer<typeof ResumeAnalysisAiSchema>;
+
+/** Full resume analysis payload returned to the client (includes fallback marker). */
+export const ResumeAnalysisOutputSchema = ResumeAnalysisAiSchema.extend({
+  isFallback: z.boolean().optional().default(false),
 });
 
 export type ResumeAnalysisOutput = z.infer<
@@ -73,6 +84,9 @@ export const GapAnalysisAiSchema = z.object({
   missingSkills: z.array(z.string()).describe(
     "The actual conceptual and technical gaps.",
   ),
+  targetSkills: z.array(z.string()).describe(
+    "Required. List of technical skills extracted from the custom JD. If NO custom JD is provided, you MUST return an empty array [].",
+  ),
   roadmap: z.array(RoadmapStepAiSchema).describe(
     "Chronological interleaving of courses and projectId-selected projects.",
   ),
@@ -99,7 +113,10 @@ export const RoadmapStepSchema = z.discriminatedUnion("type", [
 export const GapAnalysisSchema = z.object({
   matchedSkills: z.array(z.string()),
   missingSkills: z.array(z.string()),
+  targetSkills: z.array(z.string()).optional(),
   roadmap: z.array(RoadmapStepSchema),
+  /** True when rule-based logic was used (e.g., Groq unavailable or invalid output). */
+  isFallback: z.boolean().optional().default(false),
 });
 
 export type RoadmapStep = z.infer<typeof RoadmapStepSchema>;

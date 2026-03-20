@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { FileText, Loader2, X } from "lucide-react";
+import { FileText, FileUp, Loader2, TriangleAlert, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResumeAnalysisResultsSectionWithBoundary } from "@/components/ResumeAnalysisResultsSectionWithBoundary";
 import { RoadmapTimeline } from "@/components/RoadmapTimeline";
 import { RoleCombobox } from "@/components/RoleCombobox";
@@ -18,84 +19,42 @@ import {
   type ResumeAnalysisOutput,
   type GapAnalysisOutput,
 } from "@/lib/schema";
-import {
-  hashResumeText,
-  SESSION_STORAGE_PREFIX,
-} from "@/lib/hash";
 
 import jobsData from "@/data/jobs.json";
 import { RoleSpecificInterviewPrep } from "@/components/RoleSpecificInterviewPrep";
+import { CUSTOM_JD_FALLBACK_ERROR } from "@/lib/fallback";
 
-async function analyzeResumeWithGroq(
-  resumeText: string,
-): Promise<ResumeAnalysisOutput> {
-  const res = await fetch("/api/resume-analysis", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ resumeText }),
-  });
+type RoleMode = "predefined" | "custom";
 
-  if (!res.ok) {
-    const json = await res.json().catch(() => null);
-    throw new Error(json?.error ?? "Groq analysis failed.");
-  }
-
-  const json = await res.json().catch(() => null);
-  const parsed = ResumeAnalysisOutputSchema.safeParse(json);
-  if (!parsed.success) {
-    // Ensures ErrorBoundary catches invalid JSON / invalid schema outputs.
-    throw new Error("Invalid JSON structure from Groq analysis.");
-  }
-
-  return parsed.data;
-}
-
-async function runAnalysisPipeline(
-  extracted: string,
-  setResumeText: (t: string) => void,
-  setAnalysis: (a: ResumeAnalysisOutput | null) => void,
-  setErrorMessage: (m: string | null) => void,
-  setIsAnalyzing: (v: boolean) => void,
-) {
-  setResumeText(extracted);
-  setIsAnalyzing(true);
-  const resumeHash = await hashResumeText(extracted);
-  const cacheKey = `${SESSION_STORAGE_PREFIX}:${resumeHash}`;
-  const raw = window.sessionStorage.getItem(cacheKey);
-  const cached = raw ? (JSON.parse(raw) as ResumeAnalysisOutput) : null;
-  const cachedParsed = cached ? ResumeAnalysisOutputSchema.safeParse(cached) : null;
-  if (cachedParsed?.success) {
-    setAnalysis(cachedParsed.data);
-    setIsAnalyzing(false);
-    return;
-  }
-  try {
-    const analyzed = await analyzeResumeWithGroq(extracted);
-    setAnalysis(analyzed);
-    window.sessionStorage.setItem(cacheKey, JSON.stringify(analyzed));
-  } catch (err) {
-    setErrorMessage(err instanceof Error ? err.message : "Analysis failed.");
-  }
-  setIsAnalyzing(false);
-}
-
-export function ResumeUploadAndAnalyze() {
+export function ResumeUploadAndAnalyze({
+  initialTab = "upload",
+  initialRoleMode = "predefined",
+  initialJdText = "",
+}: {
+  initialTab?: "upload" | "text";
+  initialRoleMode?: RoleMode;
+  initialJdText?: string;
+} = {}) {
   const [resumeText, setResumeText] = React.useState("");
   const [pastedText, setPastedText] = React.useState("");
+  const [pdfFile, setPdfFile] = React.useState<File | null>(null);
+  const [activeTab, setActiveTab] = React.useState(initialTab);
+  const [roleMode, setRoleMode] = React.useState<RoleMode>(initialRoleMode);
+  const [jdTab, setJdTab] = React.useState<"upload" | "text">("text");
+  const [jdPdfFile, setJdPdfFile] = React.useState<File | null>(null);
+  const [jdPastedText, setJdPastedText] = React.useState(initialJdText);
   const [analysis, setAnalysis] = React.useState<ResumeAnalysisOutput | null>(
     null,
   );
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(
-    null,
-  );
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [isLoadingSample, setIsLoadingSample] = React.useState(false);
   const [editableSkills, setEditableSkills] = React.useState<string[]>([]);
   const [skillDraft, setSkillDraft] = React.useState("");
   const [selectedJobTitle, setSelectedJobTitle] = React.useState("");
-  const [gapResult, setGapResult] = React.useState<GapAnalysisOutput | null>(null);
-  const [gapLoading, setGapLoading] = React.useState(false);
-  const [gapError, setGapError] = React.useState<string | null>(null);
+  const [gapResult, setGapResult] = React.useState<GapAnalysisOutput | null>(
+    null,
+  );
 
   const isBusy = isAnalyzing;
   const jobs = jobsData as { title: string; targetSkills: string[] }[];
@@ -104,62 +63,102 @@ export function ResumeUploadAndAnalyze() {
     if (analysis) {
       setEditableSkills(analysis.skills);
       setSkillDraft("");
-      setSelectedJobTitle("");
-      setGapResult(null);
-      setGapError(null);
     } else {
       setEditableSkills([]);
       setSkillDraft("");
       setSelectedJobTitle("");
       setGapResult(null);
-      setGapError(null);
     }
   }, [analysis]);
 
-  async function handleGapAnalysis(jobTitle: string) {
-    if (!jobTitle) return;
-    if (editableSkills.length === 0) return;
-    setGapLoading(true);
-    setGapResult(null);
-    setGapError(null);
-    try {
-      const res = await fetch("/api/analyze-gap", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userSkills: editableSkills,
-          targetRole: jobTitle,
-        }),
-      });
-      if (!res.ok) {
-        const json = await res.json().catch(() => null);
-        throw new Error(json?.error ?? "Gap analysis failed.");
-      }
-      const data = (await res.json()) as GapAnalysisOutput;
-      setGapResult(data);
-    } catch (err) {
-      setGapResult(null);
-      setGapError(err instanceof Error ? err.message : "Gap analysis failed.");
-    }
-    setGapLoading(false);
-  }
+  async function handleAnalyze() {
+    const hasResumePdf = activeTab === "upload" && pdfFile && pdfFile.size > 0;
+    const hasResumeText = activeTab === "text" && pastedText.trim().length > 0;
 
-  async function handleSubmitText() {
-    const text = pastedText.trim();
-    if (!text) return;
+    if (!hasResumePdf && !hasResumeText) {
+      setErrorMessage(
+        activeTab === "upload"
+          ? "Please upload a PDF file for your resume."
+          : "Please paste your resume text.",
+      );
+      return;
+    }
+
+    if (roleMode === "predefined") {
+      if (!selectedJobTitle.trim()) {
+        setErrorMessage("Please select a target role.");
+        return;
+      }
+    } else {
+      const hasJdPdf = jdTab === "upload" && jdPdfFile && jdPdfFile.size > 0;
+      const hasJdText = jdTab === "text" && jdPastedText.trim().length > 0;
+      if (!hasJdPdf && !hasJdText) {
+        setErrorMessage(
+          jdTab === "upload"
+            ? "Please upload a PDF for the Job Description."
+            : "Please paste the Job Description text.",
+        );
+        return;
+      }
+    }
+
     setErrorMessage(null);
     setAnalysis(null);
-    setResumeText("");
-    setSelectedJobTitle("");
     setGapResult(null);
-    setGapError(null);
-    await runAnalysisPipeline(
-      text,
-      setResumeText,
-      setAnalysis,
-      setErrorMessage,
-      setIsAnalyzing,
-    );
+    setIsAnalyzing(true);
+
+    try {
+      const formData = new FormData();
+
+      if (roleMode === "predefined") {
+        formData.set("targetRole", selectedJobTitle.trim());
+      } else {
+        if (jdTab === "upload" && jdPdfFile) {
+          formData.set("jdFile", jdPdfFile);
+        } else {
+          formData.set("jdText", jdPastedText.trim());
+        }
+      }
+
+      if (hasResumePdf && pdfFile) {
+        formData.set("file", pdfFile);
+      } else {
+        formData.set("text", pastedText.trim());
+      }
+
+      const res = await fetch("/api/analyze-gap", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const json = await res.json().catch(() => null);
+        throw new Error(json?.error ?? "Analysis failed.");
+      }
+
+      const json = (await res.json()) as {
+        analysis?: ResumeAnalysisOutput;
+        gapResult?: GapAnalysisOutput;
+        extractedText?: string;
+      };
+
+      if (json.analysis && json.gapResult) {
+        const parsed = ResumeAnalysisOutputSchema.safeParse(json.analysis);
+        if (parsed.success) {
+          setAnalysis(parsed.data);
+          setResumeText(json.extractedText ?? pastedText.trim());
+        }
+        setGapResult(json.gapResult);
+      } else {
+        throw new Error("Invalid response structure.");
+      }
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : "Analysis failed.",
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
   }
 
   return (
@@ -168,89 +167,260 @@ export function ResumeUploadAndAnalyze() {
         <div className="rounded-2xl border border-border/60 bg-card/70 p-6 backdrop-blur">
           <h2 className="flex items-center gap-2 text-base font-semibold">
             <FileText className="h-5 w-5 text-primary" aria-hidden="true" />
-            Paste your resume text
+            Resume input
           </h2>
           <p className="mt-2 text-sm text-foreground/80">
-            Strict text-only bypass (no PDF parsing). Your input is SHA-256
-            hashed and cached in sessionStorage to avoid redundant Groq calls.
+            Upload a PDF or paste your resume text. Select a target role, then
+            click Analyze.
           </p>
 
-          <label className="mt-5 block text-sm font-medium text-foreground/90">
-            Resume text
-          </label>
-          <div className="mt-2 grid gap-3 md:grid-cols-[1fr_auto]">
-            <textarea
-              className="w-full min-h-[140px] rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              placeholder="Paste your resume text here..."
-              value={pastedText}
-              onChange={(e) => setPastedText(e.target.value)}
-              disabled={isBusy}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="self-start md:mt-0"
-              disabled={isBusy || isLoadingSample}
-              onClick={async () => {
-                setIsLoadingSample(true);
-                setErrorMessage(null);
-                setAnalysis(null);
-                setSelectedJobTitle("");
-                setEditableSkills([]);
-                setGapResult(null);
-                setGapError(null);
-                try {
-                  const res = await fetch("/api/sample-resume", {
-                    method: "GET",
-                  });
-                  if (!res.ok) {
-                    throw new Error("Failed to load sample resume.");
+          <div className="mt-5 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground/90 mb-2">
+                Target role
+              </label>
+              <Tabs
+                value={roleMode}
+                onValueChange={(v) => {
+                  setRoleMode(v as RoleMode);
+                  if (v === "predefined") {
+                    setJdPdfFile(null);
+                    setJdPastedText("");
+                  } else {
+                    setSelectedJobTitle("");
                   }
-                  const json = (await res.json()) as { text?: string };
-                  if (json.text) setPastedText(json.text);
-                } catch (err) {
-                  setErrorMessage(
-                    err instanceof Error ? err.message : "Failed to load sample resume.",
-                  );
-                } finally {
-                  setIsLoadingSample(false);
+                  setErrorMessage(null);
+                }}
+                className="w-full"
+              >
+                <TabsList className="grid w-full grid-cols-2 mb-3">
+                  <TabsTrigger
+                    value="predefined"
+                    className="flex items-center gap-2"
+                  >
+                    Select Predefined Role
+                  </TabsTrigger>
+                  <TabsTrigger value="custom" className="flex items-center gap-2">
+                    Upload Custom JD
+                  </TabsTrigger>
+                </TabsList>
+                {roleMode === "predefined" && (
+                  <div className="mt-2">
+                    <RoleCombobox
+                      options={jobs.map((j) => ({ title: j.title }))}
+                      value={selectedJobTitle}
+                      disabled={isBusy}
+                      onChange={setSelectedJobTitle}
+                    />
+                  </div>
+                )}
+                {roleMode === "custom" && (
+                  <Tabs
+                    value={jdTab}
+                    onValueChange={(v) => setJdTab(v as "upload" | "text")}
+                    className="mt-2 w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="upload" className="flex items-center gap-2">
+                        <FileUp className="h-4 w-4" />
+                        Upload PDF
+                      </TabsTrigger>
+                      <TabsTrigger value="text" className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Paste Text
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="upload" className="mt-4">
+                      <label
+                        htmlFor="jd-pdf-upload"
+                        className="flex flex-col items-center justify-center w-full min-h-[100px] rounded-md border border-dashed border-input bg-background/50 px-4 py-4 cursor-pointer hover:bg-background/80 transition-colors"
+                      >
+                        <FileUp className="h-8 w-8 text-muted-foreground mb-2" />
+                        <span className="text-sm text-foreground/80">
+                          {jdPdfFile
+                            ? jdPdfFile.name
+                            : "Drop JD PDF or click to browse"}
+                        </span>
+                        <input
+                          id="jd-pdf-upload"
+                          type="file"
+                          accept=".pdf"
+                          className="sr-only"
+                          disabled={isBusy}
+                          onChange={(e) => {
+                            setJdPdfFile(e.target.files?.[0] ?? null);
+                            setErrorMessage(null);
+                          }}
+                        />
+                      </label>
+                    </TabsContent>
+                    <TabsContent
+                      value="text"
+                      className="mt-4"
+                      forceMount
+                      hidden={jdTab !== "text"}
+                    >
+                      <textarea
+                        className="w-full min-h-[100px] rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        placeholder="Paste Job Description text here..."
+                        value={jdPastedText}
+                        onChange={(e) => {
+                          setJdPastedText(e.target.value);
+                          setErrorMessage(null);
+                        }}
+                        disabled={isBusy}
+                      />
+                    </TabsContent>
+                  </Tabs>
+                )}
+              </Tabs>
+            </div>
+
+            <Tabs
+              defaultValue="upload"
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as "text" | "upload")}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="upload" className="flex items-center gap-2">
+                  <FileUp className="h-4 w-4" />
+                  Upload PDF
+                </TabsTrigger>
+                <TabsTrigger value="text" className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Paste Text
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="upload" className="mt-4">
+                <label
+                  htmlFor="pdf-upload"
+                  className="flex flex-col items-center justify-center w-full min-h-[140px] rounded-md border border-dashed border-input bg-background/50 px-4 py-6 cursor-pointer hover:bg-background/80 transition-colors"
+                >
+                  <FileUp className="h-10 w-10 text-muted-foreground mb-2" />
+                  <span className="text-sm text-foreground/80">
+                    {pdfFile
+                      ? pdfFile.name
+                      : "Drop a PDF here or click to browse"}
+                  </span>
+                  <input
+                    id="pdf-upload"
+                    type="file"
+                    accept=".pdf"
+                    className="sr-only"
+                    disabled={isBusy}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      setPdfFile(f ?? null);
+                      setErrorMessage(null);
+                    }}
+                  />
+                </label>
+              </TabsContent>
+              <TabsContent
+                value="text"
+                className="mt-4"
+                forceMount
+                hidden={activeTab !== "text"}
+              >
+                <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+                  <textarea
+                    className="w-full min-h-[140px] rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    placeholder="Paste your resume text here..."
+                    value={pastedText}
+                    onChange={(e) => {
+                      setPastedText(e.target.value);
+                      setErrorMessage(null);
+                    }}
+                    disabled={isBusy}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="self-start md:mt-0"
+                    disabled={isBusy || isLoadingSample}
+                    onClick={async () => {
+                      setIsLoadingSample(true);
+                      setErrorMessage(null);
+                      try {
+                        const res = await fetch("/api/sample-resume", {
+                          method: "GET",
+                        });
+                        if (!res.ok) {
+                          throw new Error("Failed to load sample resume.");
+                        }
+                        const json = (await res.json()) as { text?: string };
+                        if (json.text) setPastedText(json.text);
+                      } catch (err) {
+                        setErrorMessage(
+                          err instanceof Error
+                            ? err.message
+                            : "Failed to load sample resume.",
+                        );
+                      } finally {
+                        setIsLoadingSample(false);
+                      }
+                    }}
+                  >
+                    {isLoadingSample ? "Loading..." : "Load Sample Resume"}
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                size="sm"
+                disabled={
+                  isBusy ||
+                  (activeTab === "upload"
+                    ? !pdfFile?.size
+                    : !pastedText.trim()) ||
+                  (roleMode === "predefined"
+                    ? !selectedJobTitle
+                    : jdTab === "upload"
+                      ? !jdPdfFile?.size
+                      : !jdPastedText.trim())
                 }
-              }}
-            >
-              {isLoadingSample ? "Loading..." : "Load Sample Resume"}
-            </Button>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <Button
-              type="button"
-              size="sm"
-              disabled={isBusy || !pastedText.trim()}
-              onClick={handleSubmitText}
-            >
-              Generate roadmap
-            </Button>
-
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>
-                {isBusy
-                  ? "Analyzing with Groq..."
-                  : resumeText
-                    ? "Text captured (ready to analyze)"
-                    : "Paste text, then map skills"}
-              </span>
-              {isBusy && (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              )}
+                onClick={handleAnalyze}
+              >
+                Analyze
+              </Button>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>
+                  {isBusy
+                    ? "Analyzing..."
+                    : "Add resume and target role or custom JD."}
+                </span>
+                {isBusy && (
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
 
+        {errorMessage === CUSTOM_JD_FALLBACK_ERROR && (
+            <div
+              className="flex items-center gap-2 rounded-md border border-amber-500 bg-amber-500/10 px-4 py-3 text-amber-500"
+              role="alert"
+            >
+              <TriangleAlert className="h-5 w-5 shrink-0" aria-hidden />
+              <p className="text-sm">{errorMessage}</p>
+            </div>
+          )}
+
         <ResumeAnalysisResultsSectionWithBoundary
           resumeText={resumeText}
           analysis={analysis}
-          errorMessage={errorMessage}
+          errorMessage={
+            errorMessage === CUSTOM_JD_FALLBACK_ERROR ? null : errorMessage
+          }
         />
 
         {analysis && (
@@ -258,7 +428,7 @@ export function ResumeUploadAndAnalyze() {
             <div className="rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur">
               <h3 className="text-sm font-semibold">Update Extracted Skills</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Refine the skills Groq extracted before we generate your roadmap.
+                Refine the extracted skills before we generate your roadmap.
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -296,7 +466,7 @@ export function ResumeUploadAndAnalyze() {
                   onChange={(e) => setSkillDraft(e.target.value)}
                   placeholder="Add a missing skill (e.g., Prisma, PAN-OS, CISSP basics)"
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  disabled={gapLoading || isBusy}
+                  disabled={isBusy}
                   onKeyDown={(e) => {
                     if (e.key !== "Enter") return;
                     e.preventDefault();
@@ -312,7 +482,7 @@ export function ResumeUploadAndAnalyze() {
                   type="button"
                   size="sm"
                   variant="outline"
-                  disabled={gapLoading || isBusy || !skillDraft.trim()}
+                  disabled={isBusy || !skillDraft.trim()}
                   onClick={() => {
                     const next = skillDraft.trim();
                     if (!next) return;
@@ -327,37 +497,21 @@ export function ResumeUploadAndAnalyze() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-semibold text-foreground/90">
-                Select a target role
-              </label>
-
-              <RoleCombobox
-                options={jobs.map((j) => ({ title: j.title }))}
-                value={selectedJobTitle}
-                disabled={gapLoading || editableSkills.length === 0}
-                onChange={(title) => {
-                  setSelectedJobTitle(title);
-                  if (title) void handleGapAnalysis(title);
-                }}
-              />
-            </div>
-
-            {gapLoading && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                <span>Building your roadmap...</span>
-              </div>
-            )}
-
-            {gapError && !gapLoading && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-foreground/90">
-                {gapError}
-              </div>
-            )}
-
-            {gapResult && !gapLoading && (
+            {gapResult && (
               <>
+                {gapResult.isFallback && (
+                  <div
+                    className="flex items-center gap-2 rounded-md border border-amber-500 bg-amber-500/10 px-4 py-3 text-amber-500 mb-6"
+                    role="status"
+                  >
+                    <TriangleAlert className="h-5 w-5 shrink-0" aria-hidden />
+                    <p className="text-sm">
+                      AI analysis is currently unavailable. Displaying rule-based
+                      skill mapping and standard curriculum for this role.
+                    </p>
+                  </div>
+                )}
+
                 <div id="results" className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2">
                   <Card className="border-zinc-800 bg-zinc-900/50">
                     <CardHeader className="pb-2">

@@ -21,6 +21,7 @@ describe("/api/analyze-gap", () => {
     const mockedGap = {
       matchedSkills: ["Networking Fundamentals"],
       missingSkills: ["PAN-OS"],
+      targetSkills: [],
       roadmap: [
         {
           stepNumber: 1,
@@ -38,7 +39,6 @@ describe("/api/analyze-gap", () => {
       ],
     };
 
-    // @ts-expect-error generateObject is mocked
     (generateObject as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
       object: mockedGap,
     });
@@ -64,6 +64,38 @@ describe("/api/analyze-gap", () => {
     const parsed = GapAnalysisSchema.safeParse(json);
     expect(parsed.success).toBe(true);
     expect(json).toEqual(parsed.data);
+    expect(json.isFallback).toBe(false);
+  });
+
+  it("returns 200 with isFallback when AI generation throws", async () => {
+    (generateObject as unknown as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("provider unavailable"),
+    );
+
+    const { POST } = await import("./route");
+
+    const target = (jobs as { title: string }[])[0]?.title;
+    expect(target).toBeTruthy();
+
+    const req = new Request("http://localhost/api/analyze-gap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userSkills: ["SIEM administration"],
+        targetRole: target,
+        resumeText:
+          "Worked with siem administration, log analysis, and incident response tooling.",
+      }),
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+
+    const json = await res.json();
+    const parsed = GapAnalysisSchema.safeParse(json);
+    expect(parsed.success).toBe(true);
+    expect(json.isFallback).toBe(true);
+    expect(json.roadmap.length).toBeGreaterThan(0);
   });
 });
 

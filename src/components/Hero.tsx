@@ -109,8 +109,9 @@ export function Hero() {
 
               <div className="mt-6 rounded-xl bg-secondary/70 p-4">
                 <p className="text-xs text-muted-foreground">
-                  Built for efficiency: resume analysis is cached by a
-                  SHA-256 hash to avoid redundant LLM calls.
+                  Lightning Fast: We securely process your resume and save it
+                  locally during your session, letting you instantly explore
+                  different career paths without waiting.
                 </p>
               </div>
             </div>

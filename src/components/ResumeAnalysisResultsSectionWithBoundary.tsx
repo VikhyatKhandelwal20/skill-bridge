@@ -13,7 +13,10 @@ export function ResumeAnalysisResultsSectionWithBoundary(
 ) {
   const { resumeText, ...sectionProps } = props;
   const fallbackAnalysis = React.useMemo(
-    () => keywordFallback(resumeText),
+    () => ({
+      ...keywordFallback(resumeText),
+      isFallback: true as const,
+    }),
     [resumeText],
   );
 

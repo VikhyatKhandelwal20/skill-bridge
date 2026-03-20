@@ -23,7 +23,10 @@ export function AboutSection() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm text-foreground/80">
-              We extract conceptual skills from your pasted text, then cache by SHA-256 so repeated runs stay fast.
+              We extract core technical skills from your uploaded resume and
+              temporarily cache them in your browser. This keeps the tool
+              ultra-fast and ready to compare your profile against any role
+              or custom job description.
             </CardContent>
           </Card>
 
