@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
+// Interview content is static JSON only, keyed by the UI-selected role title — never derived from the gap-analysis API.
 import interviewQuestions from "@/data/interview_questions.json";
 
 type Question = {

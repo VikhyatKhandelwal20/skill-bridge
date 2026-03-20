@@ -22,6 +22,7 @@ It intentionally avoids PDF parsing and relies on a strict text-area bypass + ca
 - PDF parsing is intentionally out of scope for this MVP.
 - Resume text is hashed with SHA-256 and cached in `sessionStorage` to reduce redundant Groq calls.
 - No database or persistent session storage is used for learning checklists; roadmap progress is shown purely from the AI output (`achievedSkills`).
+- **Rule-based fallbacks:** If Groq fails, `/api/resume-analysis` returns `keywordFallback()` with HTTP 200 and `isFallback: true`; `/api/analyze-gap` uses `generateRuleBasedRoadmap()` the same way. Both flows show an amber notice in the UI when `isFallback` is set.
 
 ## Environment
 

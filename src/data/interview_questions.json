@@ -49,6 +49,16 @@
       "question": "Explain how you would secure a Kubernetes cluster, specifically focusing on pod-to-pod communication.",
       "focus": "Container Security"
     }
+  ],
+  "Network Security Engineer": [
+    { "type": "Technical", "question": "Explain the difference between stateful inspection and a Next-Generation Firewall (NGFW). How does Palo Alto Networks approach this?", "focus": "Firewall Architecture" },
+    { "type": "Scenario", "question": "Users are complaining about slow speeds when connected to the VPN, but split-tunneling is disabled for compliance. How do you troubleshoot this?", "focus": "VPN & Routing" },
+    { "type": "Conceptual", "question": "Walk me through how you would securely implement SSL Inbound Inspection to decrypt traffic destined for an internal web server.", "focus": "Traffic Decryption" }
+  ],
+  "Security Automation Engineer": [
+    { "type": "Technical", "question": "How do you securely manage API keys and credentials when writing Python scripts that interact with security tools?", "focus": "Secret Management & Scripting" },
+    { "type": "Scenario", "question": "You need to automate the isolation of an endpoint when a high-severity EDR alert triggers. Walk me through the workflow and API calls.", "focus": "SOAR & Incident Response" },
+    { "type": "Behavioral", "question": "Tell me about a time an automation script you wrote failed in production. How did you handle the fallout and fix the logic?", "focus": "Accountability & Debugging" }
   ]
 }
 

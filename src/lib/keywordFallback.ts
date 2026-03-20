@@ -1,4 +1,4 @@
-import type { ResumeAnalysisOutput } from "@/lib/schema";
+import type { ResumeAnalysisAiOutput } from "@/lib/schema";
 
 import jobs from "@/data/jobs.json";
 import courses from "@/data/courses.json";
@@ -66,7 +66,7 @@ function findCourseByName(certName: string): Course | undefined {
   return (courses as Course[]).find((c) => c.name === certName);
 }
 
-export function keywordFallback(resumeText: string): ResumeAnalysisOutput {
+export function keywordFallback(resumeText: string): ResumeAnalysisAiOutput {
   const text = normalize(resumeText);
 
   // 1) Skills: extract matched "targetSkills" from our jobs list.

@@ -4,19 +4,25 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import jobs from "@/data/jobs.json";
 import projects from "@/data/projects.json";
+import { CUSTOM_JD_FALLBACK_ERROR } from "@/lib/fallback";
 import { ResumeUploadAndAnalyze } from "./ResumeUploadAndAnalyze";
 
-describe("Gap Analysis UI (Phase 3)", () => {
+function getFetchUrl(input: string | Request): string {
+  return typeof input === "string" ? input : input.url;
+}
+
+describe("ResumeUploadAndAnalyze (PDF + FormData architecture)", () => {
   beforeEach(() => {
     window.sessionStorage.clear();
     vi.restoreAllMocks();
   });
 
-  it("populates roles from jobs.json and renders gap cards from mocked /api/analyze-gap", async () => {
+  it("Successfully submits pasted text and renders roadmap", async () => {
     const mockedAnalysis = {
-      skills: ["TCP/IP"],
+      skills: ["TCP/IP", "Networking"],
       confidenceScore: 0.8,
       recommendedCerts: [{ cert: "PCNSA", confidence: 0.6 }],
+      isFallback: false,
     };
 
     const mockedGap = {
@@ -37,17 +43,25 @@ describe("Gap Analysis UI (Phase 3)", () => {
           achievedSkills: ["PAN-OS"],
         },
       ],
+      isFallback: false,
     };
 
-    const fetchMock = vi.fn(async (url: string) => {
-      if (url.includes("/api/resume-analysis")) {
-        return new Response(JSON.stringify(mockedAnalysis), {
+    const formDataResponse = {
+      analysis: mockedAnalysis,
+      gapResult: mockedGap,
+      extractedText: "Sample resume text",
+    };
+
+    const fetchMock = vi.fn(async (input: string | Request) => {
+      const url = getFetchUrl(input);
+      if (url.includes("/api/analyze-gap")) {
+        return new Response(JSON.stringify(formDataResponse), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
       }
-      if (url.includes("/api/analyze-gap")) {
-        return new Response(JSON.stringify(mockedGap), {
+      if (url.includes("/api/sample-resume")) {
+        return new Response(JSON.stringify({ text: "sample" }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });
@@ -61,34 +75,101 @@ describe("Gap Analysis UI (Phase 3)", () => {
     // @ts-expect-error - test-time override
     global.fetch = fetchMock;
 
-    render(<ResumeUploadAndAnalyze />);
+    render(<ResumeUploadAndAnalyze initialTab="text" />);
 
     const textarea = screen.getByPlaceholderText(
       "Paste your resume text here...",
     ) as HTMLTextAreaElement;
-    fireEvent.change(textarea, {
-      target: { value: "TCP/IP Cisco ASA Wireshark" },
-    });
-
-    fireEvent.click(screen.getByRole("button", { name: "Generate roadmap" }));
-
-    // Wait until the analysis section renders (select should appear).
-    await waitFor(() => {
-      expect(screen.getByText(/Confidence:\s*80%/)).toBeInTheDocument();
-    });
+    fireEvent.change(textarea, { target: { value: "Sample resume text" } });
 
     const roleCombo = screen.getByRole("combobox") as HTMLInputElement;
-    fireEvent.change(roleCombo, { target: { value: jobs[0].title } });
-    fireEvent.click(screen.getByText(jobs[0].title));
+    fireEvent.focus(roleCombo);
+    fireEvent.change(roleCombo, { target: { value: (jobs as { title: string }[])[0].title } });
+    fireEvent.click(screen.getByText((jobs as { title: string }[])[0].title));
 
-    // Verify the three cards render mocked gap data.
+    const analyzeBtn = screen.getByRole("button", { name: "Analyze" });
+    fireEvent.click(analyzeBtn);
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled();
+    });
+
+    const analyzeGapCall = fetchMock.mock.calls.find(([url]) =>
+      getFetchUrl(url).includes("/api/analyze-gap"),
+    );
+    expect(analyzeGapCall).toBeDefined();
+    const [, init] = analyzeGapCall!;
+    expect(init?.body).toBeInstanceOf(FormData);
+    const body = init?.body as FormData;
+    expect(body.get("targetRole")).toBe((jobs as { title: string }[])[0].title);
+    expect(body.get("text")).toBe("Sample resume text");
+
     await waitFor(() => {
       expect(screen.getByText("Networking Fundamentals")).toBeInTheDocument();
-      expect(screen.getAllByText("PAN-OS").length).toBeGreaterThan(0);
-      expect(
-        screen.getByText(/Foundational course to start closing the gap\./),
-      ).toBeInTheDocument();
+    });
+    expect(screen.getByText("Chronological Roadmap")).toBeInTheDocument();
+  });
+
+  it("Triggers deterministic fallback when AI fails", async () => {
+    const fetchMock = vi.fn(async () => {
+      return new Response(
+        JSON.stringify({ error: "Internal Server Error" }),
+        { status: 500, headers: { "Content-Type": "application/json" } },
+      );
+    });
+
+    // @ts-expect-error - test-time override
+    global.fetch = fetchMock;
+
+    render(<ResumeUploadAndAnalyze initialTab="text" />);
+
+    const textarea = screen.getByPlaceholderText(
+      "Paste your resume text here...",
+    ) as HTMLTextAreaElement;
+    fireEvent.change(textarea, { target: { value: "Sample resume text" } });
+
+    const roleCombo = screen.getByRole("combobox") as HTMLInputElement;
+    fireEvent.focus(roleCombo);
+    fireEvent.change(roleCombo, { target: { value: (jobs as { title: string }[])[0].title } });
+    fireEvent.click(screen.getByText((jobs as { title: string }[])[0].title));
+
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await waitFor(
+      () => {
+        expect(screen.getByText(/AI.*unavailable|rule-based/i)).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it("API returns error when Custom JD is used during AI fallback", async () => {
+    const fetchMock = vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({ error: CUSTOM_JD_FALLBACK_ERROR }),
+          { status: 500, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+    // @ts-expect-error - test-time override
+    global.fetch = fetchMock;
+
+    render(
+      <ResumeUploadAndAnalyze
+        initialTab="text"
+        initialRoleMode="custom"
+        initialJdText="sample jd"
+      />,
+    );
+    fireEvent.change(
+      screen.getByPlaceholderText("Paste your resume text here..."),
+      { target: { value: "resume" } },
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Custom Job Descriptions require AI/)).toBeInTheDocument();
     });
   });
 });
-
